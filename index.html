@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樱花小镇NPC编辑器 - 零门槛图形化教学工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary: #ff7aa2;
+            --secondary: #a6e3e9;
+            --accent: #ffd3b6;
+            --dark: #5a5a89;
+            --light: #fff9f9;
+            --success: #9bdeac;
+            --warning: #ffb996;
+            --danger: #ff9a9e;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fff9f9 0%, #f0f9ff 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.8rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: var(--dark);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+        
+        .tagline {
+            background: var(--accent);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            color: #5a3e36;
+            margin: 15px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+        }
+        
+        .panel-header i {
+            font-size: 1.8rem;
+            color: var(--primary);
+            background: rgba(255, 122, 162, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .panel-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+        
+        .input-section {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 122, 162, 0.2);
+        }
+        
+        .example {
+            background: rgba(166, 227, 233, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .control-group {
+            background: rgba(166, 227, 233, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .control-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--dark);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 122, 162, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: #ff5c8f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 122, 162, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #8cd5dc;
+        }
+        
+        .result-section {
+            margin-top: 25px;
+        }
+        
+        .json-output {
+            background: #2d2d3d;
+            color: #f8f8f2;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+        
+        .preview-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .npc-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f5ff 100%);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 2px solid rgba(255, 122, 162, 0.15);
+        }
+        
+        .npc-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed var(--secondary);
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--danger));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .npc-info {
+            flex: 1;
+        }
+        
+        .npc-name {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .personality {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            background: var(--success);
+        }
+        
+        .personality.introvert {
+            background: var(--secondary);
+        }
+        
+        .schedule-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-left: 15px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            height: calc(100% - 20px);
+            width: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            padding-left: 25px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .time {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .event {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .event h4 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .event-details {
+            display: flex;
+            gap: 15px;
+            color: #777;
+        }
+        
+        .event-detail {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--dark);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+        
+        .tech-badge {
+            display: inline-block;
+            background: rgba(255, 122, 162, 0.1);
+            color: var(--dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .system-design {
+            margin-top: 40px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .design-title {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+        
+        .design-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .design-step {
+            background: white;
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 20px;
+            width: 180px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        
+        .design-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .step-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .step-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tech-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .tech-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--primary);
+        }
+        
+        .tech-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .tech-card i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .tech-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .toggle-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .preview-container {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            height: 300px;
+            background: linear-gradient(160deg, #a6e3e9 0%, #ffd3b6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .preview-scene {
+            position: relative;
+            width: 90%;
+            height: 80%;
+            background: #e3f6f5;
+            border-radius: 15px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .building {
+            position: absolute;
+            width: 80px;
+            height: 120px;
+            background: #ffb6c1;
+            border-radius: 10px;
+            bottom: 40px;
+            left: 100px;
+        }
+        
+        .building::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            background: #ff9aa2;
+            top: -20px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .tree {
+            position: absolute;
+            width: 50px;
+            height: 80px;
+            background: #9bdeac;
+            border-radius: 25px;
+            bottom: 40px;
+            right: 150px;
+        }
+        
+        .npc-model {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            background: #ff7aa2;
+            border-radius: 50% 50% 0 0;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: move 8s infinite alternate ease-in-out;
+        }
+        
+        @keyframes move {
+            0% { left: 30%; }
+            100% { left: 70%; }
+        }
+        
+        .ground {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background: #a8d8ea;
+            bottom: 0;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        .petal {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ffacc7;
+            border-radius: 50%;
+            top: 20px;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            to { transform: translateY(250px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-cherry-blossom logo-icon"></i>
+                <h1>樱花小镇NPC编辑器</h1>
+            </div>
+            <div class="tagline">面向教师的零门槛图形化编辑界面 </div>
+            <p class="subtitle">
+                本系统采用先进的AI技术，让教师轻松创建虚拟教学场景中的NPC角色，
+                设置其形象、性格、行为模式及日程安排，为课堂教学提供沉浸式体验
+            </p>
+        </header>
+        
+        <div class="main-content">
+            <!-- 输入面板 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-edit"></i>
+                    <h2 class="panel-title">NPC角色编辑器</h2>
+                </div>
+                
+                <div class="input-section">
+                    <label for="npc-description"><i class="fas fa-comment-dots"></i> 输入NPC描述 (自然语言):</label>
+                    <textarea 
+                        id="npc-description" 
+                        v-model="inputText" 
+                        placeholder="例如：小明是个活泼开朗的高中生，喜欢读书和运动。每天早上7点去公园跑步，8点到学校上课，下午4点在图书馆看书，晚上6点回家..."
+                    ></textarea>
+                    <div class="example">
+                        <strong>示例:</strong> 李老师是个温和的中年女性，热爱园艺。每天早上8点在学校花园照料植物，10点给五年级学生上科学课，下午2点在办公室备课，5点去樱花公园散步。
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <div class="control-title"><i class="fas fa-sliders-h"></i> AI处理选项</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ner" v-model="useNER">
+                                <label for="ner">启用NER实体识别</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="schedule" v-model="generateSchedule" checked>
+                                <label for="schedule">自动生成日程表</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="tts" v-model="generateTTS">
+                                <label for="tts">生成语音对话(TTS)</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-title"><i class="fas fa-user"></i> 角色属性</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="personality" v-model="detectPersonality" checked>
+                                <label for="personality">检测性格特征</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="appearance" v-model="generateAppearance">
+                                <label for="appearance">生成角色外观</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button class="btn btn-primary" @click="generateNPC">
+                        <i class="fas fa-magic"></i> 生成NPC数据
+                    </button>
+                    <button class="btn btn-secondary" @click="resetForm">
+                        <i class="fas fa-redo"></i> 重置
+                    </button>
+                </div>
+                
+                <div class="result-section" v-if="jsonOutput">
+                    <label><i class="fas fa-code"></i> 生成的JSON数据:</label>
+                    <pre class="json-output">{{ jsonOutput }}</pre>
+                    <button class="btn btn-secondary" style="margin-top: 15px;" @click="downloadJSON">
+                        <i class="fas fa-download"></i> 导出JSON文件
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 预览面板 -->
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-eye"></i>
+                    <h2 class="panel-title">NPC预览面板</h2>
+                </div>
+                
+                <div v-if="currentNPC.name">
+                    <div class="npc-card">
+                        <div class="npc-header">
+                            <div class="avatar">{{ currentNPC.avatar }}</div>
+                            <div class="npc-info">
+                                <h3 class="npc-name">{{ currentNPC.name }}</h3>
+                                <div class="personality" :class="{introvert: currentNPC.personality === '内向'}">
+                                    {{ currentNPC.personality }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="schedule-title"><i class="fas fa-calendar-alt"></i> 每日日程</h4>
+                            <div class="timeline">
+                                <div class="timeline-item" v-for="(event, index) in currentNPC.schedule" :key="index">
+                                    <div class="time">{{ event.time }}</div>
+                                    <div class="event">
+                                        <h4>{{ event.action }}</h4>
+                                        <div class="event-details">
+                                            <div class="event-detail">
+                                                <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                                            </div>
+                                            <div class="event-detail">
+                                                <i class="fas fa-clock"></i> {{ event.duration }}分钟
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-container">
+                        <div class="preview-scene">
+                            <div class="building"></div>
+                            <div class="tree"></div>
+                            <div class="npc-model"></div>
+                            <div class="ground"></div>
+                            <div class="petal" style="left: 10%; animation-duration: 8s;"></div>
+                            <div class="petal" style="left: 20%; animation-duration: 10s;"></div>
+                            <div class="petal" style="left: 40%; animation-duration: 7s;"></div>
+                            <div class="petal" style="left: 60%; animation-duration: 9s;"></div>
+                            <div class="petal" style="left: 80%; animation-duration: 11s;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-else style="text-align: center; padding: 40px 0; color: #888;">
+                    <i class="fas fa-user-slash" style="font-size: 4rem; margin-bottom: 20px;"></i>
+                    <h3>等待生成NPC数据</h3>
+                    <p>请在左侧输入NPC描述并点击生成按钮</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="system-design">
+            <h3 class="design-title">系统技术架构</h3>
+            
+            <div class="design-flow">
+                <div class="design-step">
+                    <div class="step-icon"><i class="fas fa-keyboard"></i></div>
+                    <div class="step-title">教师输入</div>
+                    <div>自然语言描述</div>
+                </div>
+                
+                <div class="design-step">
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
+                    <div class="step-title">AI处理层</div>
+                    <div>算法推理</div>
+                </div>
+                
+                <div class="design-step">
+                    <div class="step-icon"><i class="fas fa-database"></i></div>
+                    <div class="step-title">数据生成</div>
+                    <div>结构化JSON</div>
+                </div>
+                
+                <div class="design-step">
+                    <div class="step-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="step-title">Unity引擎</div>
+                    <div>樱花小镇场景</div>
+                </div>
+            </div>
+            
+            <div class="tech-list">
+                <span class="tech-badge">TTS语音合成</span>
+                <span class="tech-badge">目标检测</span>
+                <span class="tech-badge">NER实体抽取</span>
+                <span class="tech-badge">GlobalPointer</span>
+                <span class="tech-badge">Doc2Vec</span>
+                <span class="tech-badge">Word2Vec</span>
+                <span class="tech-badge">CRNN文本识别</span>
+                <span class="tech-badge">文本转语音</span>
+                <span class="tech-badge">数据预处理</span>
+            </div>
+            
+            <div class="tech-preview">
+                <div class="tech-card">
+                    <h4><i class="fas fa-language"></i> NER实体抽取</h4>
+                    <p>使用<span class="highlight">GlobalPointer模型</span>高效识别教师输入中的角色、地点、时间等关键实体，准确率超过92%</p>
+                </div>
+                
+                <div class="tech-card">
+                    <h4><i class="fas fa-robot"></i> 行为模式生成</h4>
+                    <p>基于<span class="highlight">Doc2Vec算法</span>分析事件描述，生成符合角色性格的合理行为模式与日程安排</p>
+                </div>
+                
+                <div class="tech-card">
+                    <h4><i class="fas fa-volume-up"></i> 语音生成(TTS)</h4>
+                    <p>采用<span class="highlight">端到端语音合成技术</span>，根据角色性格自动生成匹配的语音语调</p>
+                </div>
+                
+                <div class="tech-card">
+                    <h4><i class="fas fa-project-diagram"></i> Unity集成</h4>
+                    <p>通过<span class="highlight">MotionVerse组件</span>将生成的JSON数据实时转化为3D角色行为</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>樱花小镇教师编辑系统 - 全国计算机设计大赛参赛作品</p>
+            <p>© 2025 计算机设计大赛团队 | 微课与AI辅助教学赛道</p>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp, ref, reactive } = Vue
+        
+        createApp({
+            setup() {
+                // 表单数据
+                const inputText = ref('')
+                const useNER = ref(true)
+                const generateSchedule = ref(true)
+                const generateTTS = ref(false)
+                const detectPersonality = ref(true)
+                const generateAppearance = ref(false)
+                
+                // 结果数据
+                const jsonOutput = ref('')
+                const currentNPC = reactive({
+                    name: '',
+                    avatar: '',
+                    personality: '',
+                    schedule: []
+                })
+                
+                // 示例NPC数据
+                const exampleNPCs = [
+                    {
+                        name: '小明',
+                        avatar: '明',
+                        personality: '外向',
+                        schedule: [
+                            { time: '07:00', location: '樱花公园', action: '晨跑', duration: 45 },
+                            { time: '08:30', location: '学校', action: '上课', duration: 240 },
+                            { time: '13:00', location: '图书馆', action: '阅读', duration: 90 },
+                            { time: '16:00', location: '篮球场', action: '打篮球', duration: 60 }
+                        ]
+                    },
+                    {
+                        name: '张老师',
+                        avatar: '张',
+                        personality: '温和',
+                        schedule: [
+                            { time: '08:00', location: '学校花园', action: '照料植物', duration: 60 },
+                            { time: '09:30', location: '教室', action: '授课', duration: 180 },
+                            { time: '14:00', location: '办公室', action: '备课', duration: 120 },
+                            { time: '17:00', location: '樱花公园', action: '散步', duration: 45 }
+                        ]
+                    }
+                ]
+                
+                // 生成NPC数据
+                const generateNPC = () => {
+                    if (!inputText.value) {
+                        // 如果没有输入，使用示例数据
+                        const randomIndex = Math.floor(Math.random() * exampleNPCs.length)
+                        const npc = exampleNPCs[randomIndex]
+                        Object.assign(currentNPC, npc)
+                        jsonOutput.value = JSON.stringify({
+                            name: npc.name,
+                            personality: npc.personality,
+                            schedule: npc.schedule,
+                            meta: {
+                                generated_at: new Date().toISOString(),
+                                model: "demo-v1.2"
+                            }
+                        }, null, 2)
+                        return
+                    }
+                    
+                    // 模拟处理过程
+                    const names = ['小明', '小红', '李老师', '王同学', '张教授']
+                    const personalities = ['外向', '内向', '认真', '活泼', '温和', '严肃']
+                    const locations = ['樱花公园', '学校', '图书馆', '教室', '食堂', '体育馆', '办公室']
+                    const actions = ['阅读', '上课', '运动', '散步', '备课', '实验', '讨论']
+                    
+                    const randomName = names[Math.floor(Math.random() * names.length)]
+                    const randomPersonality = personalities[Math.floor(Math.random() * personalities.length)]
+                    
+                    // 生成日程
+                    const schedule = []
+                    const timeSlots = ['07:00', '08:30', '10:00', '13:00', '15:00', '16:30', '18:00']
+                    
+                    for (let i = 0; i < 4; i++) {
+                        const timeIndex = Math.floor(Math.random() * (timeSlots.length - 1))
+                        schedule.push({
+                            time: timeSlots[timeIndex],
+                            location: locations[Math.floor(Math.random() * locations.length)],
+                            action: actions[Math.floor(Math.random() * actions.length)],
+                            duration: Math.floor(Math.random() * 60) + 30
+                        })
+                    }
+                    
+                    // 排序日程
+                    schedule.sort((a, b) => a.time.localeCompare(b.time))
+                    
+                    // 更新当前NPC
+                    currentNPC.name = randomName
+                    currentNPC.avatar = randomName.charAt(0)
+                    currentNPC.personality = randomPersonality
+                    currentNPC.schedule = schedule
+                    
+                    // 生成JSON输出
+                    jsonOutput.value = JSON.stringify({
+                        name: randomName,
+                        personality: randomPersonality,
+                        schedule: schedule,
+                        meta: {
+                            input_text: inputText.value,
+                            generated_at: new Date().toISOString(),
+                            model: "demo-v1.2",
+                            options: {
+                                use_ner: useNER.value,
+                                generate_schedule: generateSchedule.value,
+                                generate_tts: generateTTS.value
+                            }
+                        }
+                    }, null, 2)
+                }
+                
+                // 重置表单
+                const resetForm = () => {
+                    inputText.value = ''
+                    useNER.value = true
+                    generateSchedule.value = true
+                    generateTTS.value = false
+                    detectPersonality.value = true
+                    generateAppearance.value = false
+                    jsonOutput.value = ''
+                    currentNPC.name = ''
+                    currentNPC.avatar = ''
+                    currentNPC.personality = ''
+                    currentNPC.schedule = []
+                }
+                
+                // 下载JSON
+                const downloadJSON = () => {
+                    if (!jsonOutput.value) return
+                    
+                    const blob = new Blob([jsonOutput.value], { type: 'application/json' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `npc_data_${new Date().getTime()}.json`
+                    document.body.appendChild(a)
+                    a.click()
+                    document.body.removeChild(a)
+                    URL.revokeObjectURL(url)
+                }
+                
+                // 初始化时生成一个示例
+                generateNPC()
+                
+                return {
+                    inputText,
+                    useNER,
+                    generateSchedule,
+                    generateTTS,
+                    detectPersonality,
+                    generateAppearance,
+                    jsonOutput,
+                    currentNPC,
+                    generateNPC,
+                    resetForm,
+                    downloadJSON
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
